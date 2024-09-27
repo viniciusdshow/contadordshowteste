@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=640, initial-scale=1.0">
+    <title>Contador de Dias</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 640px;
+            height: 256px;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: white;
+            background-color: #1a1a1a; /* Cor de fundo */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 10px;
+            width: 90%;
+            height: 80%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: #e0f7fa;
+            text-shadow: 1px 1px 3px #000;
+            margin: 0;
+        }
+
+        .counter {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #b3e5fc;
+            text-shadow: 2px 2px 5px #000;
+        }
+
+        .record {
+            font-size: 1rem;
+            color: #81d4fa;
+            margin-top: 5px;
+        }
+
+        /* Botões */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background-color: #0277bd;
+        }
+
+        /* Área da logo */
+        .logo {
+            width: 100px;
+            height: 50px;
+            background-color: white;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        /* Input para alterar a data inicial */
+        .input-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="date"] {
+            padding: 5px;
+            border: 1px solid #0288d1;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="logo.png" alt="Logo" style="width: 100%; height: 100%;"> <!-- Substituir pelo caminho da logo desejada -->
+        </div>
+
+        <!-- Título -->
+        <h1>Contador de Dias</h1>
+
+        <!-- Contador de dias -->
+        <div class="counter" id="daysCounter">0</div>
+        <div class="record" id="recordCounter">Recorde: 0 dias</div>
+
+        <!-- Botões -->
+        <div class="button-container">
+            <button id="resetButton">Resetar Contador</button>
+            <button id="resetRecordButton">Resetar Recorde</button>
+        </div>
+
+        <!-- Alterar data inicial -->
+        <div class="input-container">
+            <label for="startDateInput">Escolher data inicial:</label>
+            <input type="date" id="startDateInput">
+            <button id="updateDateButton">Atualizar</button>
+        </div>
+    </div>
+
+    <script>
+        // Recuperar os dados do LocalStorage
+        let startDate = localStorage.getItem('startDate');
+        let record = localStorage.getItem('record') || 0;
+
+        const daysCounter = document.getElementById('daysCounter');
+        const recordCounter = document.getElementById('recordCounter');
+        const startDateInput = document.getElementById('startDateInput');
+        const resetButton = document.getElementById('resetButton');
+        const resetRecordButton = document.getElementById('resetRecordButton');
+        const updateDateButton = document.getElementById('updateDateButton');
+
+        // Função para atualizar o contador de dias
+        function updateDaysCounter() {
+            const now = new Date();
+            const elapsedDays = Math.floor((now - new Date(startDate)) / (1000 * 60 * 60 * 24));
+            daysCounter.textContent = elapsedDays >= 0 ? elapsedDays : 0; // Não permite contagem negativa
+
+            if (elapsedDays > record) {
+                record = elapsedDays;
+                localStorage.setItem('record', record);
+            }
+
+            recordCounter.textContent = `Recorde: ${record} dias`;
+        }
+
+        // Função para resetar o contador
+        resetButton.addEventListener('click', function() {
+            startDate = new Date().toISOString().split('T')[0]; // Define para a data atual
+            localStorage.setItem('startDate', startDate);
+            startDateInput.value = startDate; // Atualiza o campo de entrada
+            alert('Contador resetado!');
+        });
+
+        // Função para resetar o recorde
+        resetRecordButton.addEventListener('click', function() {
+            record = 0; // Reseta o recorde para 0
+            localStorage.setItem('record', record);
+            recordCounter.textContent = `Recorde: ${record} dias`; // Atualiza a exibição do recorde
+            alert('Recorde resetado!');
+        });
+
+        // Função para alterar a data inicial
+        updateDateButton.addEventListener('click', function() {
+            const newDateStr = startDateInput.value;
+            if (newDateStr) {
+                startDate = newDateStr;
+                localStorage.setItem('startDate', startDate);
+                alert('Data inicial atualizada!');
+            } else {
+                alert('Por favor, escolha uma data válida.');
+            }
+        });
+
+        // Inicializar a página
+        if (!startDate) {
+            startDate = new Date().toISOString().split('T')[0]; // Define para a data atual
+            localStorage.setItem('startDate', startDate);
+        } else {
+            startDateInput.value = startDate; // Atualiza o campo de entrada com a data atual
+        }
+
+        // Atualiza o contador a cada segundo
+        setInterval(updateDaysCounter, 1000);
+    </script>
+</body>
+</html>
